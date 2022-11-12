@@ -4,7 +4,7 @@ variable "aws_region" {
   default     = "eu-west-2"
   type        = string
 }
-# Defining CIDR Block for VPC
+# Making VPC CIDR Block a variable
 variable "vpc_cidr" {
   description = "vpc cidr block"
   default     = "10.0.0.0/16"
@@ -34,28 +34,29 @@ variable "priv_subnet2_cidr" {
   type    = string
 }
 
-# Making Database username sensitive
+#making resource tags a variable
+variable "tags" {
+  description = "aws resource tags according to department"
+  type        = list(string)
+  default     = ["prod", "test", "dev"]
+}
+
+#Making Database username sensitive
 variable "db_username" {
   description = "RDS administrator username"
   type        = string
   sensitive   = true
 }
-# Making Database Password sensitive
+
+#Making Database Password sensitive
 variable "db_password" {
   description = "RDS administrator password"
   type        = string
   sensitive   = true
 }
-#making public route table a variable
-variable "aws_route_table_pub_route" {
-description = "public route table"
-default     = "aws_route_table.priv_route"
-type        = string
-}
 
-#making private route table a variable
-variable "aws_route_table_priv_route" {    
-description = "private route table"
-default     = "aws_route_table.priv_route"
-type        = string
-}
+#Making db subnet group name a variable
+variable "aws_db_subnet_group_default" {
+  description = "my default db subnet group"
+  type        = string
+  }

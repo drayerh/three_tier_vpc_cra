@@ -1,10 +1,10 @@
 # Creating RDS Instance
 resource "aws_db_subnet_group" "default" {
-  name       = "main"
-  subnet_ids = [aws_subnet.application-subnet-1.id, aws_subnet.application-subnet-2.id]
+  name       = var.aws_db_subnet_group_default
+  subnet_ids = ["${aws_subnet.priv_subnet_1.id}", "${aws_subnet.priv_subnet_2.id}"]
 
   tags = {
-    Name = "My DB subnet group"
+    Name = var.tags[0]
   }
 }
 
@@ -20,5 +20,5 @@ resource "aws_db_instance" "default" {
   password               = var.db_password
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.database-sg.id]
-  publicly_accessible    = true
+  publicly_accessible    = false
 }
