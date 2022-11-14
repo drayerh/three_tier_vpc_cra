@@ -45,7 +45,7 @@ resource "aws_subnet" "priv_subnet_1" {
   cidr_block              = var.priv_subnet1_cidr
   map_public_ip_on_launch = false
   availability_zone       = "eu-west-2a"
-  
+
   tags = {
     Name = var.tags[0]
   }
@@ -57,7 +57,7 @@ resource "aws_subnet" "priv_subnet_2" {
   cidr_block              = var.priv_subnet2_cidr
   map_public_ip_on_launch = false
   availability_zone       = "eu-west-2b"
-      
+
   tags = {
     Name = var.tags[0]
   }
@@ -77,26 +77,33 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Associating Public Subnets to Public Route Table
-resource "aws_route_table_association" "public" {
-  subnet_id      = ["aws_subnet.public_subnet_1.id", "aws_subnet.public_subnet_2.id"]
+# Associating Public Subnet 1 to Public Route Table
+resource "aws_route_table_association" "public1" {
+  subnet_id      = aws_subnet.public_subnet_1.id
   route_table_id = aws_route_table.public.id
 }
+
+# Associating Public Subnet 2 to Public Route Table
+resource "aws_route_table_association" "public2" {
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_route_table.public.id
+}
+
 
 # Creating Private Route Table
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.demovpc.id
 }
 
-# associating private route table with NAT Gateway
-resource "aws_route" "nat_association" {
+# Associating Private Subnet 1 with Private Route Table
+resource "aws_route_table_association" "private1" {
+  subnet_id      = aws_subnet.priv_subnet_1.id
   route_table_id = aws_route_table.private.id
-  depends_on = [aws_nat_gateway.pub_sub_1]
 }
 
-# Associating Private Subnets with Private Route Table
-resource "aws_route_table_association" "private" {
-  subnet_id      = ["aws_subnet.priv_subnet_1.id", "aws_subnet.priv_subnet_2.id"]
+# Associating Private Subnet 2  with Private Route Table
+resource "aws_route_table_association" "private2" {
+  subnet_id      = aws_subnet.priv_subnet_2.id
   route_table_id = aws_route_table.private.id
 }
 # Creating an Elastic IP for pub_sub_1 NAT 
@@ -113,7 +120,7 @@ resource "aws_nat_gateway" "pub_sub_1" {
     Name = var.tags[0]
   }
 
-  depends_on = [aws_internet_gateway.demogateway.id]
+  depends_on = [aws_internet_gateway.demogateway]
 }
 
 # Creating an Elastic IP for pub_sub_2 NAT Gateway
@@ -130,5 +137,11 @@ resource "aws_nat_gateway" "pub_sub_2" {
     Name = var.tags[0]
   }
 
-  depends_on = [aws_internet_gateway.demogateway.id]
+  depends_on = [aws_internet_gateway.demogateway]
+}
+# associating private route table with NAT Gateway
+resource "aws_route" "nat_association" {
+  route_table_id         = aws_route_table.private.id
+  nat_gateway_id         = aws_nat_gateway.pub_sub_1.id
+  destination_cidr_block = "0.0.0.0/0"
 }

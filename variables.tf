@@ -32,8 +32,8 @@ variable "priv_subnet1_cidr" {
 variable "priv_subnet2_cidr" {
   default = "10.0.4.0/24"
   type    = string
-}
 
+}
 #making resource tags a variable
 variable "tags" {
   description = "aws resource tags according to department"
@@ -59,4 +59,5 @@ variable "db_password" {
 variable "aws_db_subnet_group_default" {
   description = "my default db subnet group"
   type        = string
-  }
+  default     = "my subnet group"
+}
